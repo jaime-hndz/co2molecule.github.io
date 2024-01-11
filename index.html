@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Molécula de Dióxido de Carbono en 3D con Two.js</title>
+    <style>
+        body { margin: 0;
+            font-family: 'Arial', sans-serif; /* Fuente moderna y legible */
+            background-color: #f4f4f4; }
+        canvas { width: 100%; height: 100% }
+        .text { 
+            background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+            color: #fff;
+            position: absolute;
+            top: 20px; /* Posicionado en la parte superior con algo de margen */
+            left: 20px;
+            padding: 20px;
+            border-radius: 10px; /* Bordes redondeados */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave para dar profundidad */
+            transition: all 0.3s ease; /* Transición suave para efectos hover */
+            max-width: 300px; /* Ancho máximo para la legibilidad */
+        }
+        .text:hover {
+            background-color: rgba(0, 0, 0, 0.8); /* Cambio de color al pasar el mouse */
+        }
+        h1, h2 {
+            margin: 0 0 10px 0; /* Ajuste de márgenes para títulos */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra en los textos para mejorar contraste */
+        }
+        ul {
+            padding: 0;
+            list-style-type: none; /* Quitar los bullets de la lista */
+        }
+        ul li {
+            margin-bottom: 5px; /* Espacio entre elementos de la lista */
+            padding-left: 15px; /* Espaciado para la lista */
+            position: relative;
+        }
+        ul li:before {
+            content: '•';
+            color: #f00; /* Color rojo para los bullets */
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="text">
+        <h1>Molécula de Dióxido de Carbono en 3D</h1>
+        <h2>Realizado por:</h2>
+        <ul>
+            <li> Jaime Hernández - 1099041</li>
+            <li> Raquel Guerrero - 1113516</li>
+            <li> Elisainy Rivera - 1122546 </li>
+            <li> Lorena Veras - 1115655</li>
+            <li> Mia Ovando - 1121673</li>
+        </ul>
+
+    </div>
+    <script src="https://threejs.org/build/three.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let carbonAtom, oxygenAtom1, oxygenAtom2, bond1, bond2, bond3, bond4;
+
+        function init() {
+            scene = new THREE.Scene();
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Crear el átomo de carbono
+            const carbonGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const carbonMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 }); // Color gris oscuro
+            carbonAtom = new THREE.Mesh(carbonGeometry, carbonMaterial);
+            scene.add(carbonAtom);
+
+            // Crear los átomos de oxígeno
+            const oxygenGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const oxygenMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Color rojo
+
+            oxygenAtom1 = new THREE.Mesh(oxygenGeometry, oxygenMaterial);
+            oxygenAtom1.position.x = -2; // Posicionar a la izquierda del carbono
+            scene.add(oxygenAtom1);
+
+            oxygenAtom2 = new THREE.Mesh(oxygenGeometry, oxygenMaterial);
+            oxygenAtom2.position.x = 2; // Posicionar a la derecha del carbono
+            scene.add(oxygenAtom2);
+
+            // Crear los enlaces (cilindros)
+            const bondGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1.8, 32);
+            const bondMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 }); // Color crema
+
+            // Enlaces hacia el oxígeno izquierdo
+            bond1 = new THREE.Mesh(bondGeometry, bondMaterial);
+            bond1.position.x = -1;
+            bond1.position.y = 0.2;
+            bond1.rotation.z = Math.PI / 2;
+            scene.add(bond1);
+
+            bond2 = new THREE.Mesh(bondGeometry, bondMaterial);
+            bond2.position.x = -1;
+            bond2.position.y = -0.2;
+            bond2.rotation.z = Math.PI / 2;
+            scene.add(bond2);
+
+            // Enlaces hacia el oxígeno derecho
+            bond3 = new THREE.Mesh(bondGeometry, bondMaterial);
+            bond3.position.x = 1;
+            bond3.position.y = 0.2;
+            bond3.rotation.z = Math.PI / 2;
+            scene.add(bond3);
+
+            bond4 = new THREE.Mesh(bondGeometry, bondMaterial);
+            bond4.position.x = 1;
+            bond4.position.y = -0.2;
+            bond4.rotation.z = Math.PI / 2;
+            scene.add(bond4);
+
+            // Posicionar la cámara
+            camera.position.y = 3;
+
+            
+            // Iniciar la animación
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Actualizar la posición de la cámara
+            const time = Date.now() * 0.0005; // Tiempo actual en segundos
+            const radius = 6; // Radio de la órbita
+
+            camera.position.x = radius * Math.sin(time);
+            camera.position.z = radius * Math.cos(time);
+            camera.lookAt(scene.position); // Hacer que la cámara mire siempre al centro de la escena
+
+            // Renderizar la escena
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Iniciar la aplicación
+        init();
+    </script>
+</body>
+</html>
